@@ -84,6 +84,7 @@ export default class AMQPBroker implements CeleryBroker {
     const messageBody = JSON.stringify(body);
     const contentType = "application/json";
     const contentEncoding = "utf-8";
+    const dynamicRoutingKey = body[1]?.queue ? body[1]?.queue : routingKey
 
     return this.channel
       .then(ch =>
@@ -98,7 +99,7 @@ export default class AMQPBroker implements CeleryBroker {
           .then(() => Promise.resolve(ch))
       )
       .then(ch =>
-        ch.publish(exchange, routingKey, Buffer.from(messageBody), {
+        ch.publish(exchange, dynamicRoutingKey, Buffer.from(messageBody), {
           contentType,
           contentEncoding,
           headers,
